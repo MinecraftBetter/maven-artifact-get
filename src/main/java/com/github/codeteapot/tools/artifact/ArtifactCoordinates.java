@@ -7,6 +7,7 @@ import static java.util.stream.Stream.concat;
 
 import java.beans.ConstructorProperties;
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 /**
@@ -19,6 +20,22 @@ public class ArtifactCoordinates implements Serializable {
   private final String groupId;
   private final String artifactId;
   private final String version;
+
+  /**
+   * Coordinates with given group identifier and artifact identifier.
+   *
+   * @param groupId Group identifier.
+   * @param artifactId Artifact identifier.
+   */
+  @ConstructorProperties({
+          "groupId",
+          "artifactId"
+  })
+  public ArtifactCoordinates(String groupId, String artifactId) {
+    this.groupId = requireNonNull(groupId);
+    this.artifactId = requireNonNull(artifactId);
+    this.version = null;
+  }
 
   /**
    * Coordinates with given group identifier, artifact identifier and version.
@@ -65,6 +82,11 @@ public class ArtifactCoordinates implements Serializable {
     return version;
   }
 
+  @Override
+  public String toString() {
+    return format("%s:%s:%s", groupId, artifactId, version);
+  }
+
   /**
    * Based on artifact identifier hash.
    */
@@ -85,9 +107,16 @@ public class ArtifactCoordinates implements Serializable {
       ArtifactCoordinates coordinates = (ArtifactCoordinates) obj;
       return groupId.equals(coordinates.groupId)
           && artifactId.equals(coordinates.artifactId)
-          && version.equals(coordinates.version);
+          && Objects.equals(version, coordinates.version);
     }
     return false;
+  }
+
+  String getMetadataPath() {
+    return concat(
+            Stream.of(groupId.split("\\.")),
+            Stream.of(artifactId, "maven-metadata.xml"))
+            .collect(joining("/"));
   }
 
   String getPath(String extension) {
@@ -95,6 +124,5 @@ public class ArtifactCoordinates implements Serializable {
         Stream.of(groupId.split("\\.")),
         Stream.of(artifactId, version, format("%s-%s.%s", artifactId, version, extension)))
             .collect(joining("/"));
-
   }
 }

@@ -54,6 +54,6 @@ class XMLProject {
   }
 
   private ArtifactCoordinates toRequiredDependency(XMLDependency dependency) {
-    return dependency.toRequiredDependency(parent);
+    return dependency.toRequiredDependency();
   }
 }
