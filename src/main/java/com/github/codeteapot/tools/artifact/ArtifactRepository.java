@@ -74,7 +74,8 @@ public class ArtifactRepository {
     }
 
     public ArtifactCoordinates resolve(ArtifactCoordinates coordinates) throws IOException, ArtifactRepositoryException {
-        if(coordinates.getVersion() == null || coordinates.getVersion().trim().isEmpty())
+        String version = coordinates.getVersion();
+        if(version == null || version.trim().isEmpty() || version.matches("\\$\\{.*}"))
         {
             XMLMetadata metadata = unmarshalXml(coordinates.getMetadataPath(), XMLMetadata.class);
             coordinates = metadata.getVersioning().getLatest(metadata);
